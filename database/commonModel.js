@@ -1,10 +1,4 @@
-var MysqlJson = require('mysql-json');
-var mysqlJson = new MysqlJson({
-    host:'127.0.0.1',
-    user:'root',
-    password:'bitcot',
-    database:'vueblog'
-});
+const mysqlJson = require('./dbconnection');
 
 module.exports = {
     'findById' : function(tableName,Id){      
@@ -14,13 +8,15 @@ module.exports = {
                     resolve({
                         'status':true,
                         'status_code':200,
-                        'result':response
+                        "message":"response for your query",  
+                        "data":response                     
                     });
                 }else{
                     resolve({
                         'status':false,
                         'status_code':500,
-                        'result':err
+                        'message':"error occur in insert data",
+                        'error':err.sqlMessage 
                     });
                 } 
             }); 
@@ -33,14 +29,27 @@ module.exports = {
                     resolve({
                         'status':true,
                         'status_code':200,
-                        'result':response
+                        "message":"response for your query",
+                        'data':response
                     });
                 }else{
                     resolve({
                         'status':false,
                         'status_code':500,
-                        'result':err
+                        'message':"error occur in insert data",
+                        'error':err.sqlMessage 
                     });
+                } 
+            }); 
+        });
+    },
+    'customQueryResponse' : function(sqlQuery){      
+        return new Promise(function(resolve, reject) {   
+            mysqlJson.query(sqlQuery, function(err, response) {
+                if (!err) {
+                    resolve(response);
+                }else{
+                    resolve(err);
                 } 
             }); 
         });
@@ -54,35 +63,37 @@ module.exports = {
                     resolve({
                         'status':true,
                         'status_code':200,
-                        'result':response
+                        'message':'New record inserted successfully' 
                     });
                 }else{
                     resolve({
                         'status':false,
                         'status_code':500,
-                        'result':err
+                        'message':"error occur in insert data",
+                        'error':err.sqlMessage 
                     });
                 } 
             }); 
         });
     },
-    'updateData' : function(tableName,wherePayload,jsonPayload){      
+    'updateData' : function(tableName,jsonPayload,wherePayload){  
         return new Promise(function(resolve, reject) {   
-            mysqlJson.update(tableName, 
-                wherePayload,
-                jsonPayload
+            mysqlJson.update(tableName,  
+                jsonPayload,
+                wherePayload
                 , function(err, response) {
                 if (!err) {
                     resolve({
                         'status':true,
                         'status_code':200,
-                        'result':response
+                        'message':'New record updated successfully' 
                     });
                 }else{
                     resolve({
                         'status':false,
                         'status_code':500,
-                        'result':err
+                        'message':"error occur in update data",
+                        'error':err.sqlMessage 
                     });
                 } 
             }); 
@@ -97,13 +108,14 @@ module.exports = {
                     resolve({
                         'status':true,
                         'status_code':200,
-                        'result':response
+                        "message":"Record deleted successfully" 
                     });
                 }else{
                     resolve({
                         'status':false,
                         'status_code':500,
-                        'result':err
+                        'message':"error occur in insert data",
+                        'error':err.sqlMessage 
                     });
                 } 
             }); 
